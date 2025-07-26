@@ -125,7 +125,7 @@ app.get("/api/health", async (req, res) => {
     console.error("Health check failed:", error.message)
     res.status(503).json({
       status: "ERROR",
-      message: `Server is running but database connection failed , ${dbConfig}`,
+      message: `Server is running but database connection failed , ${ dbConfig.host,dbConfig.user,dbConfig.database,dbConfig.port}`,
       error: error.message,
       timestamp: new Date().toISOString(),
     })
