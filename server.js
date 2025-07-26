@@ -43,6 +43,19 @@ console.log("Database config:", {
   port: dbConfig.port,
 })
 
+// Debug: Log all environment variables related to database
+console.log("Environment variables check:")
+console.log("MYSQLHOST:", process.env.MYSQLHOST)
+console.log("MYSQLUSER:", process.env.MYSQLUSER)
+console.log("MYSQLPASSWORD:", process.env.MYSQLPASSWORD ? "***SET***" : "NOT SET")
+console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE)
+console.log("MYSQLPORT:", process.env.MYSQLPORT)
+console.log("DB_HOST:", process.env.DB_HOST)
+console.log("DB_USER:", process.env.DB_USER)
+console.log("DB_PASSWORD:", process.env.DB_PASSWORD ? "***SET***" : "NOT SET")
+console.log("DB_NAME:", process.env.DB_NAME)
+console.log("DB_PORT:", process.env.DB_PORT)
+
 // Create database connection
 async function createConnection() {
   try {
@@ -51,6 +64,7 @@ async function createConnection() {
     return connection
   } catch (error) {
     console.error("Database connection failed:", error.message)
+    console.error("Full error:", error)
     throw error
   }
 }
