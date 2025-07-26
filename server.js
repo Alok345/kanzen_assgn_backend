@@ -24,13 +24,13 @@ app.use(
 app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
-// Database configuration
+// Database configuration - Support both Railway and custom environment variables
 const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "mesothelioma_claims",
-  port: Number.parseInt(process.env.DB_PORT) || 3306,
+  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
+  database: process.env.MYSQLDATABASE || process.env.DB_NAME || "mesothelioma_claims",
+  port: Number.parseInt(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
   connectTimeout: 60000,
   acquireTimeout: 60000,
   timeout: 60000,
@@ -95,12 +95,26 @@ app.get("/", (req, res) => {
   })
 })
 
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "OK",
-    message: "Server is running",
-    timestamp: new Date().toISOString(),
-  })
+app.get("/api/health", async (req, res) => {
+  try {
+    // Test database connection
+    const connection = await createConnection()
+    await connection.end()
+    
+    res.json({
+      status: "OK",
+      message: "Server is running and database is connected",
+      timestamp: new Date().toISOString(),
+    })
+  } catch (error) {
+    console.error("Health check failed:", error.message)
+    res.status(503).json({
+      status: "ERROR",
+      message: "Server is running but database connection failed",
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    })
+  }
 })
 
 // POST endpoint - Submit form data
@@ -247,7 +261,14 @@ async function startServer() {
     console.log("Starting server...")
     console.log("Environment:", process.env.NODE_ENV || "development")
 
-    await initializeDatabase()
+    // Try to initialize database, but don't fail if it doesn't work
+    try {
+      await initializeDatabase()
+      console.log("✅ Database initialized successfully")
+    } catch (dbError) {
+      console.warn("⚠️ Database initialization failed:", dbError.message)
+      console.log("Server will start but database operations may fail")
+    }
 
     app.listen(PORT, () => {
       console.log(`✅ Server is running on port ${PORT}`)
