@@ -15,6 +15,7 @@ app.use(
     origin: [
       "http://localhost:3000", 
       "http://127.0.0.1:3000",
+      "https://kanzenassgnbackend-production.up.railway.app",
       // Add your Vercel domain here after deployment
       process.env.FRONTEND_URL || "https://your-app.vercel.app"
     ],
