@@ -26,11 +26,11 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 // Database configuration - Support both Railway and custom environment variables
 const dbConfig = {
-  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
-  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
-  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
-  database: process.env.MYSQLDATABASE || process.env.DB_NAME || "mesothelioma_claims",
-  port: Number.parseInt(process.env.MYSQLPORT || process.env.DB_PORT) || 3306,
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: Number.parseInt(process.env.MYSQLPORT),
   connectTimeout: 60000,
   acquireTimeout: 60000,
   timeout: 60000,
@@ -60,7 +60,7 @@ console.log("DB_PORT:", process.env.DB_PORT)
 async function createConnection() {
   try {
     console.log("coonecting to", process.env.MYSQL_URL)
-    const connection = await mysql.createConnection(process.env.MYSQL_URL)
+    const connection = await mysql.createConnection(dbConfig)
     console.log("Database connected successfully")
     return connection
   } catch (error) {
@@ -125,7 +125,7 @@ app.get("/api/health", async (req, res) => {
     console.error("Health check failed:", error.message)
     res.status(503).json({
       status: "ERROR",
-      message: `Server is running but database connection failed , ${process.env.DATABASE_URL}`,
+      message: `Server is running but database connection failed , ${dbConfig}`,
       error: error.message,
       timestamp: new Date().toISOString(),
     })
