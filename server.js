@@ -59,6 +59,7 @@ console.log("DB_PORT:", process.env.DB_PORT)
 // Create database connection
 async function createConnection() {
   try {
+    console.log("coonecting to", process.env.MYSQL_URL)
     const connection = await mysql.createConnection(process.env.MYSQL_URL)
     console.log("Database connected successfully")
     return connection
